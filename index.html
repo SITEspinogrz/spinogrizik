@@ -3,189 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Spinogrizik Ultra</title>
+    <title>Spinogrizik Network</title>
     
-    <!-- EmailJS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
     <style>
-        /* ОСНОВНЫЕ СТИЛИ И ПЕРЕМЕННЫЕ */
-        :root { 
-            --glass: rgba(255, 255, 255, 0.07); 
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --accent: #6c5ce7;
-            --accent-hover: #8172fa;
-        }
+        :root { --glass: rgba(255, 255, 255, 0.08); --glass-border: rgba(255, 255, 255, 0.15); --accent: #6c5ce7; --accent-hover: #8172fa; --bg-dark: rgba(0,0,0,0.3); }
+        body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: url('https://img.freepik.com/free-vector/wave-dark-gradient-background-desogn_343694-4095.jpg') no-repeat center center fixed; background-size: cover; color: white; min-height: 100dvh; display: flex; flex-direction: column; -webkit-tap-highlight-color: transparent; }
         
-        body { 
-            margin: 0; 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
-            background: url('https://img.freepik.com/free-vector/wave-dark-gradient-background-desogn_343694-4095.jpg') no-repeat center center fixed; 
-            background-size: cover; 
-            color: white; 
-            min-height: 100dvh; 
-            display: flex; 
-            flex-direction: column; 
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        /* АНИМАЦИИ */
-        @keyframes slideUpFade {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
         
-        /* НАВИГАЦИЯ */
-        nav { 
-            background: rgba(0,0,0,0.4); 
-            backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px);
-            padding: 15px 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            position: sticky; 
-            top: 0; 
-            z-index: 100; 
-            border-bottom: 1px solid var(--glass-border); 
-            box-shadow: 0 4px 30px rgba(0,0,0,0.3);
-        }
-        .logo { font-size: 1.6em; font-weight: 800; cursor: pointer; letter-spacing: 1px; text-shadow: 0 2px 10px rgba(255,255,255,0.2); }
-
-        /* СТРАНИЦЫ И КАРТОЧКИ */
-        .page { display: none; padding: 20px 15px; flex: 1; max-width: 800px; margin: 0 auto; width: 100%; box-sizing: border-box; }
-        .page.active { display: block; animation: slideUpFade 0.5s ease cubic-bezier(0.16, 1, 0.3, 1); }
+        nav { background: rgba(0,0,0,0.5); backdrop-filter: blur(20px); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--glass-border); }
+        .logo { font-size: 1.6em; font-weight: 900; cursor: pointer; letter-spacing: 1px; color: #fff; }
         
-        .card { 
-            background: var(--glass); 
-            backdrop-filter: blur(16px); 
-            -webkit-backdrop-filter: blur(16px);
-            padding: 22px; 
-            margin-bottom: 25px; 
-            border-radius: 20px; 
-            border: 1px solid var(--glass-border); 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: transform 0.3s;
-        }
-
-        /* ЭЛЕМЕНТЫ ВВОДА */
-        input, textarea { 
-            width: 100%; padding: 14px; margin: 8px 0 15px 0; 
-            border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); 
-            background: rgba(0,0,0,0.2); color: white; 
-            box-sizing: border-box; font-family: inherit; font-size: 1em;
-            transition: border 0.3s, background 0.3s;
-        }
-        input:focus, textarea:focus { outline: none; border-color: var(--accent); background: rgba(0,0,0,0.4); }
-        input[type="file"] { padding: 10px; background: rgba(255,255,255,0.05); }
-
-        /* КНОПКИ */
-        button { 
-            background: var(--accent); color: white; padding: 14px 20px; 
-            border: none; border-radius: 12px; cursor: pointer; 
-            font-weight: bold; font-size: 1em; transition: 0.2s; width: 100%; 
-            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
-        }
-        button:hover { background: var(--accent-hover); transform: translateY(-2px); }
-        button:active { transform: translateY(1px) scale(0.98); box-shadow: none; }
+        .page { display: none; padding: 20px 15px; flex: 1; max-width: 800px; margin: 0 auto; width: 100%; box-sizing: border-box; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
         
-        /* ДИЗАЙН ПОСТА */
-        .prompt-box { 
-            position: relative; background: rgba(0,0,0,0.3); 
-            padding: 15px; border-radius: 12px; margin: 15px 0; border: 1px solid rgba(255,255,255,0.05);
-        }
-        .prompt-text { white-space: pre-wrap; margin: 0; font-family: monospace; font-size: 0.95em; line-height: 1.5; color: #e2e8f0; }
-        .copy-btn { 
-            position: absolute; top: 10px; right: 10px; 
-            background: rgba(255,255,255,0.1); border-radius: 8px; padding: 6px 12px; 
-            font-size: 0.8em; width: auto; box-shadow: none; border: 1px solid rgba(255,255,255,0.1);
-        }
-        .post-image { width: 100%; max-height: 400px; object-fit: cover; border-radius: 12px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        .card { background: var(--glass); backdrop-filter: blur(16px); padding: 20px; margin-bottom: 20px; border-radius: 20px; border: 1px solid var(--glass-border); }
+        
+        /* Мини-карточка в ленте */
+        .mini-card { cursor: pointer; transition: 0.2s; padding: 15px 20px; }
+        .mini-card:hover { background: rgba(255,255,255,0.12); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .tag { font-size: 0.7em; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 12px; margin-left: 8px; font-weight: normal; }
+        .meta-info { font-size: 0.85em; opacity: 0.7; display: flex; gap: 15px; margin-top: 10px; align-items: center; }
+        .user-link { color: #a29bfe; cursor: pointer; font-weight: bold; text-decoration: none; }
+        .user-link:hover { text-decoration: underline; }
 
-        /* КНОПКИ ЛАЙКОВ/КОММЕНТОВ */
-        .actions { display: flex; gap: 10px; flex-wrap: wrap; }
-        .action-btn { background: rgba(255,255,255,0.1); box-shadow: none; width: auto; padding: 8px 16px; border-radius: 20px; }
-        .action-btn:hover { background: rgba(255,255,255,0.2); transform: none; }
+        input, textarea { width: 100%; padding: 14px; margin: 8px 0 15px 0; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: var(--bg-dark); color: white; box-sizing: border-box; font-family: inherit; font-size: 1em; }
+        input:focus, textarea:focus { outline: none; border-color: var(--accent); }
+        
+        button { background: var(--accent); color: white; padding: 14px 20px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 1em; transition: 0.2s; width: 100%; }
+        button:hover { background: var(--accent-hover); }
+        .btn-small { width: auto; padding: 8px 16px; font-size: 0.9em; border-radius: 10px; margin: 0; }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: var(--accent); color: white; }
 
-        /* КОММЕНТАРИИ */
-        .comments-section { margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
-        .comment { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 10px; margin-bottom: 10px; font-size: 0.9em; }
-        .comment-box { display: flex; gap: 10px; }
-        .comment-box input { margin: 0; flex: 1; }
-        .comment-box button { width: auto; padding: 10px 20px; margin: 0; }
+        /* Профиль */
+        .profile-header { text-align: center; padding: 30px 20px; background: rgba(0,0,0,0.4); border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--glass-border); }
+        .profile-avatar { font-size: 4em; margin-bottom: 10px; }
+        .stats { display: flex; justify-content: center; gap: 20px; margin: 15px 0; font-size: 0.9em; opacity: 0.9; }
+        
+        /* Сортировка (Топ/Новые) */
+        .sort-tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .sort-tab { background: rgba(255,255,255,0.05); padding: 8px 15px; border-radius: 15px; cursor: pointer; white-space: nowrap; font-size: 0.9em; border: 1px solid transparent; }
+        .sort-tab.active { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); font-weight: bold; }
 
-        /* АВТОРИЗАЦИЯ И КАПЧА */
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 14px; }
-        .tab { flex: 1; padding: 12px; text-align: center; border-radius: 10px; cursor: pointer; transition: 0.3s; font-weight: bold; }
-        .tab.active-tab { background: var(--accent); }
-        .captcha-box { display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 12px; margin-bottom: 15px; }
-        canvas { background: white; border-radius: 8px; cursor: pointer; }
+        /* Внутри промпта */
+        .prompt-box { position: relative; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 15px; margin: 15px 0; border: 1px solid rgba(255,255,255,0.05); }
+        .prompt-text { white-space: pre-wrap; margin: 0; font-family: monospace; font-size: 0.95em; line-height: 1.6; color: #e2e8f0; }
+        .copy-btn { position: absolute; top: 10px; right: 10px; background: var(--accent); width: auto; padding: 5px 12px; font-size: 0.8em; }
+        .post-img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 12px; margin-top: 15px; }
+        .actions-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
+        .action-btn { background: rgba(255,255,255,0.1); width: auto; padding: 10px 15px; border-radius: 12px; display: flex; align-items: center; gap: 5px; }
+        .action-btn.active { background: var(--accent); }
 
-        /* ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ (ТОСТЫ) */
-        .toast { 
-            position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); 
-            background: #2ecc71; color: white; padding: 12px 25px; border-radius: 30px; 
-            font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
-            transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000;
-        }
+        .comments-list { margin-top: 20px; }
+        .comment { background: var(--bg-dark); padding: 12px; border-radius: 12px; margin-bottom: 10px; font-size: 0.9em; }
+
+        .toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #2ecc71; color: white; padding: 12px 25px; border-radius: 30px; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: 0.4s; z-index: 1000; }
         .toast.show { bottom: 30px; }
+        
+        .header-back { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; cursor: pointer; color: #a29bfe; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <nav>
     <div class="logo" onclick="showPage('home')">Spinogrizik</div>
-    <div id="navProfile" style="display: flex; gap: 10px; align-items: center;"></div>
+    <div id="navProfile" style="display: flex; gap: 10px;"></div>
 </nav>
 
-<!-- Уведомление -->
 <div id="toast" class="toast">Успешно!</div>
 
-<!-- Главная: Лента -->
+<!-- ЛЕНТА ПРОМПТОВ -->
 <div id="home" class="page active">
-    <h2 style="margin-top:0;">Лента промптов</h2>
+    <div class="sort-tabs">
+        <div class="sort-tab active" onclick="sortFeed('new')">🔥 Новые</div>
+        <div class="sort-tab" onclick="sortFeed('likes')">❤️ Топ по лайкам</div>
+        <div class="sort-tab" onclick="sortFeed('copies')">📋 Топ по копированиям</div>
+    </div>
     <div id="postsList"></div>
 </div>
 
-<!-- Публикация -->
+<!-- СТРАНИЦА ОДНОГО ПРОМПТА -->
+<div id="postDetail" class="page">
+    <div class="header-back" onclick="showPage('home')">← Назад в ленту</div>
+    <div id="postContent"></div>
+</div>
+
+<!-- ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ -->
+<div id="profile" class="page">
+    <div class="header-back" onclick="showPage('home')">← В ленту</div>
+    <div id="profileContent"></div>
+</div>
+
+<!-- ПУБЛИКАЦИЯ -->
 <div id="publish" class="page">
     <div class="card">
-        <h2 style="margin-top:0;">Опубликовать промпт</h2>
-        <input id="p_model" placeholder="Имя модели (напр. Gemini)">
+        <h2 id="pubTitle" style="margin-top:0;">Опубликовать промпт</h2>
+        <input id="p_model" placeholder="Имя модели (напр. Gemini 3.1)">
         <input id="p_nn" placeholder="Название нейросети">
-        <textarea id="p_text" placeholder="Введите ваш промпт сюда..." style="height: 150px; resize: vertical;"></textarea>
-        
-        <label style="font-size: 0.9em; opacity: 0.8; margin-bottom: 5px; display: block;">Прикрепить картинку (опционально):</label>
+        <textarea id="p_text" placeholder="Введите ваш промпт..." style="height: 150px;"></textarea>
+        <label style="font-size: 0.9em; opacity: 0.8; margin-bottom: 5px; display: block;">Картинка (опционально):</label>
         <input type="file" id="p_image" accept="image/*">
-        
-        <button onclick="addPost()" style="margin-top: 10px;">🚀 Опубликовать</button>
+        <button onclick="savePost()" style="margin-top: 10px;" id="pubBtn">🚀 Опубликовать</button>
     </div>
 </div>
 
-<!-- Авторизация -->
+<!-- АВТОРИЗАЦИЯ -->
 <div id="auth" class="page">
-    <div class="card">
-        <div class="tabs">
-            <div class="tab active-tab" id="tabLogin" onclick="switchTab('login')">Вход</div>
-            <div class="tab" id="tabReg" onclick="switchTab('reg')">Регистрация</div>
+    <div class="card" style="max-width: 400px; margin: 0 auto;">
+        <div class="sort-tabs" style="margin-bottom: 15px;">
+            <div class="sort-tab active" id="tabLogin" onclick="switchAuth('login')" style="flex:1; text-align:center;">Вход</div>
+            <div class="sort-tab" id="tabReg" onclick="switchAuth('reg')" style="flex:1; text-align:center;">Регистрация</div>
         </div>
         <div id="authForms"></div>
-        <div class="captcha-box">
-            <canvas id="captchaCanvas" width="120" height="40" onclick="generateCaptcha()"></canvas>
+        <div style="display:flex; gap:10px; margin:15px 0; background:rgba(0,0,0,0.3); padding:10px; border-radius:12px;">
+            <canvas id="captchaCanvas" width="100" height="40" onclick="genCaptcha()"></canvas>
             <input id="captchaInput" placeholder="Код с картинки" style="margin:0;">
         </div>
-        <button id="authActionBtn" onclick="processAuth()">Продолжить</button>
+        <button id="authBtn" onclick="processAuth()">Продолжить</button>
     </div>
 </div>
 
-<!-- Верификация -->
+<!-- ВЕРИФИКАЦИЯ -->
 <div id="verify" class="page">
-    <div class="card">
+    <div class="card" style="max-width: 400px; margin: 0 auto;">
         <h2>Подтверждение Email</h2>
-        <p>Код отправлен на почту.</p>
-        <input id="v_code" type="number" placeholder="Введите 6-значный код">
+        <input id="v_code" type="number" placeholder="6-значный код с почты">
         <button onclick="verifyCode()">Подтвердить</button>
-        <button onclick="showPage('auth')" style="background: rgba(255,255,255,0.1); margin-top:10px; box-shadow:none;">Отмена</button>
     </div>
 </div>
 
@@ -195,306 +141,347 @@
     const EMAILJS_PUBLIC_KEY = "kTfs9-_qPr1PSracH";
     const REPO = "SITEspinogrz/spinogrizik";
 
-    if(EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== "ТВОЙ_PUBLIC_KEY_ОТ_EMAILJS") { 
-        emailjs.init(EMAILJS_PUBLIC_KEY); 
-    }
+    if(EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== "ТВОЙ_PUBLIC_KEY") emailjs.init(EMAILJS_PUBLIC_KEY); 
     // ====================================================
 
+    // БАЗА ДАННЫХ
     let currentUser = JSON.parse(localStorage.getItem('currentUser')); 
     let usersDB = JSON.parse(localStorage.getItem('usersDB') || '[]'); 
     let posts = JSON.parse(localStorage.getItem('posts') || '[]');
 
-    let currentCaptchaText = "";
-    let authMode = 'login'; 
+    let currentSort = 'new';
+    let editPostId = null; 
+    let captchaCode = "";
+    let authMode = 'login';
+    let tempAuth = null;
     let expectedCode = "";
-    let pendingUserData = null;
 
-    // --- УВЕДОМЛЕНИЯ ---
-    function showToast(msg, bg = "#2ecc71") {
-        const toast = document.getElementById('toast');
-        toast.innerText = msg;
-        toast.style.background = bg;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
+    // ОБНОВЛЕНИЕ ДАННЫХ ЮЗЕРА
+    function syncUser() {
+        if(!currentUser) return;
+        let idx = usersDB.findIndex(u => u.name === currentUser.name);
+        if(idx > -1) {
+            usersDB[idx] = currentUser;
+            localStorage.setItem('usersDB', JSON.stringify(usersDB));
+        }
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
     }
 
-    // --- НАВИГАЦИЯ ---
+    // УВЕДОМЛЕНИЯ
+    function toast(msg, bg = "#2ecc71") {
+        const t = document.getElementById('toast');
+        t.innerText = msg; t.style.background = bg;
+        t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // НАВИГАЦИЯ
     function showPage(id) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        if (id === 'home') renderPosts();
-        if (id === 'auth') { generateCaptcha(); renderAuthForm(); }
+        if(id === 'home') sortFeed(currentSort);
+        window.scrollTo(0, 0);
     }
 
     function initNav() {
         const nav = document.getElementById('navProfile');
         if (currentUser) {
+            // Проверяем структуру старых аккаунтов
+            if(!currentUser.following) currentUser.following = [];
+            if(!currentUser.followers) currentUser.followers = [];
+            if(!currentUser.favorites) currentUser.favorites = [];
+            syncUser();
+
             nav.innerHTML = `
-                <span style="font-weight: bold; display: none; @media(min-width: 500px){display:inline;}">👤 ${currentUser.name}</span>
-                <button class="action-btn" onclick="showPage('publish')" style="background: var(--accent);">➕ Пост</button>
-                <button class="action-btn" onclick="logout()" style="background: rgba(255,0,0,0.2);">Выйти</button>
+                <button class="btn-small btn-outline" onclick="openProfile('${currentUser.name}')">👤 ${currentUser.name}</button>
+                <button class="btn-small" onclick="openPublish()">➕ Пост</button>
             `;
         } else {
-            nav.innerHTML = `<button class="action-btn" onclick="showPage('auth')" style="background: var(--accent);">🔑 Войти</button>`;
+            nav.innerHTML = `<button class="btn-small" onclick="openAuth()">Войти</button>`;
         }
-        renderPosts();
     }
 
-    function logout() {
-        currentUser = null;
-        localStorage.removeItem('currentUser');
-        initNav();
-        showPage('home');
-        showToast("Вы вышли из аккаунта", "#e74c3c");
-    }
-
-    // --- КАПЧА ---
-    function generateCaptcha() {
-        const canvas = document.getElementById('captchaCanvas');
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for(let i=0; i<30; i++) {
-            ctx.fillStyle = `rgba(${Math.random()*255},${Math.random()*255},${Math.random()*255}, 0.5)`;
-            ctx.beginPath();
-            ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*3, 0, Math.PI*2);
-            ctx.fill();
-        }
-        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-        currentCaptchaText = "";
-        for(let i=0; i<5; i++) currentCaptchaText += chars.charAt(Math.floor(Math.random() * chars.length));
-        ctx.font = "bold 22px Courier";
-        ctx.fillStyle = "#2c3e50";
-        ctx.setTransform(1, Math.random()*0.2-0.1, Math.random()*0.2-0.1, 1, 0, 0); 
-        ctx.fillText(currentCaptchaText, 15, 28);
-        ctx.setTransform(1, 0, 0, 1, 0, 0); 
-    }
-
-    // --- АВТОРИЗАЦИЯ ---
-    function switchTab(mode) {
+    // АВТОРИЗАЦИЯ
+    function openAuth() { showPage('auth'); switchAuth('login'); genCaptcha(); }
+    function switchAuth(mode) {
         authMode = mode;
-        document.getElementById('tabLogin').classList.toggle('active-tab', mode === 'login');
-        document.getElementById('tabReg').classList.toggle('active-tab', mode === 'reg');
-        renderAuthForm();
-        generateCaptcha();
-    }
-
-    function renderAuthForm() {
-        const html = authMode === 'login' 
+        document.querySelectorAll('#auth .sort-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(mode === 'login' ? 'tabLogin' : 'tabReg').classList.add('active');
+        document.getElementById('authForms').innerHTML = mode === 'login' 
             ? `<input id="a_email" type="email" placeholder="Email"><input id="a_pass" type="password" placeholder="Пароль">`
             : `<input id="a_name" type="text" placeholder="Никнейм"><input id="a_email" type="email" placeholder="Email"><input id="a_pass" type="password" placeholder="Пароль">`;
-        document.getElementById('authForms').innerHTML = html;
-        document.getElementById('authActionBtn').innerText = authMode === 'login' ? 'Войти' : 'Зарегистрироваться';
+        document.getElementById('authBtn').innerText = mode === 'login' ? 'Войти' : 'Регистрация';
+        genCaptcha();
     }
-
+    function genCaptcha() {
+        const ctx = document.getElementById('captchaCanvas').getContext('2d');
+        ctx.clearRect(0,0,100,40); ctx.fillStyle = "#fff"; ctx.fillRect(0,0,100,40);
+        captchaCode = Math.random().toString(36).substring(2,7).toUpperCase();
+        ctx.font = "bold 20px Arial"; ctx.fillStyle = "#000"; ctx.fillText(captchaCode, 15, 28);
+    }
     async function processAuth() {
         const email = document.getElementById('a_email').value.trim();
         const pass = document.getElementById('a_pass').value.trim();
-        const captchaInput = document.getElementById('captchaInput').value.toUpperCase();
-
-        if(!email || !pass) return showToast("Заполните все поля!", "#e74c3c");
-        if(captchaInput !== currentCaptchaText) {
-            showToast("Неверная капча!", "#e74c3c");
-            generateCaptcha();
-            return;
-        }
-
-        if (authMode === 'reg') {
+        if(document.getElementById('captchaInput').value.toUpperCase() !== captchaCode) return toast("Неверная капча!", "#e74c3c"), genCaptcha();
+        
+        if(authMode === 'reg') {
             const name = document.getElementById('a_name').value.trim();
-            if(!name) return showToast("Введите Никнейм!", "#e74c3c");
-            if(usersDB.find(u => u.email === email)) return showToast("Email уже занят!", "#e74c3c");
-            pendingUserData = { name, email, pass };
+            if(!name || !email || !pass) return toast("Заполните всё", "#e74c3c");
+            if(usersDB.find(u => u.email === email || u.name === name)) return toast("Email или Ник занят", "#e74c3c");
+            tempAuth = { name, email, pass, followers:[], following:[], favorites:[] };
         } else {
-            const user = usersDB.find(u => u.email === email && u.pass === pass);
-            if(!user) return showToast("Неверный Email или Пароль!", "#e74c3c");
-            pendingUserData = user;
+            tempAuth = usersDB.find(u => u.email === email && u.pass === pass);
+            if(!tempAuth) return toast("Неверные данные", "#e74c3c");
         }
 
         expectedCode = Math.floor(100000 + Math.random() * 900000).toString();
-        
         try {
-            document.getElementById('authActionBtn').innerText = "Отправка письма...";
+            document.getElementById('authBtn').innerText = "Отправка...";
             await emailjs.send("service_bpp4tkr", "template_fskbb8q", { to_email: email, code: expectedCode });
-            showToast("Код отправлен на почту!");
-            showPage('verify');
-        } catch (error) {
-            showToast("Режим теста. Ваш код: " + expectedCode, "#f39c12");
-            showPage('verify');
-        } finally {
-            document.getElementById('authActionBtn').innerText = "Продолжить";
-        }
+            toast("Код отправлен!"); showPage('verify');
+        } catch(e) {
+            toast("Режим без Email. Код: " + expectedCode, "#f39c12"); showPage('verify');
+        } finally { document.getElementById('authBtn').innerText = "Продолжить"; }
     }
-
     function verifyCode() {
-        if (document.getElementById('v_code').value !== expectedCode) return showToast("Неверный код!", "#e74c3c");
-
-        if (authMode === 'reg') {
-            usersDB.push(pendingUserData);
-            localStorage.setItem('usersDB', JSON.stringify(usersDB));
-            showToast("Регистрация успешна!");
-        } else {
-            showToast("Вы вошли в систему!");
-        }
-
-        currentUser = pendingUserData;
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        expectedCode = ""; pendingUserData = null;
-        initNav(); showPage('home');
+        if(document.getElementById('v_code').value !== expectedCode) return toast("Неверный код", "#e74c3c");
+        if(authMode === 'reg') { usersDB.push(tempAuth); localStorage.setItem('usersDB', JSON.stringify(usersDB)); }
+        currentUser = tempAuth; syncUser();
+        toast("Вход выполнен!"); initNav(); showPage('home');
     }
+    function doLogout() { currentUser = null; localStorage.removeItem('currentUser'); initNav(); showPage('home'); toast("Вы вышли"); }
 
-    // --- КОНВЕРТАЦИЯ КАРТИНКИ В BASE64 ---
-    function getBase64(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
-        });
-    }
+    // ЛЕНТА (Окошки)
+    function sortFeed(type) {
+        currentSort = type;
+        document.querySelectorAll('#home .sort-tab').forEach(t => t.classList.remove('active'));
+        event?.currentTarget?.classList.add('active');
 
-    // --- ПУБЛИКАЦИЯ ---
-    async function addPost() {
-        if (!currentUser) return showToast("Войдите в аккаунт!", "#e74c3c");
-        const model = document.getElementById('p_model').value;
-        const nn = document.getElementById('p_nn').value;
-        const text = document.getElementById('p_text').value;
-        const fileInput = document.getElementById('p_image');
+        let sorted = [...posts];
+        if(type === 'new') sorted.sort((a,b) => b.id - a.id);
+        if(type === 'likes') sorted.sort((a,b) => (b.likes?.length||0) - (a.likes?.length||0));
+        if(type === 'copies') sorted.sort((a,b) => (b.copies||0) - (a.copies||0));
 
-        if (!model || !text) return showToast("Заполните модель и промпт!", "#e74c3c");
-
-        // Обработка картинки
-        let imageData = null;
-        if (fileInput.files.length > 0) {
-            const file = fileInput.files[0];
-            if (file.size > 2 * 1024 * 1024) return showToast("Картинка слишком большая! Максимум 2МБ.", "#e74c3c");
-            imageData = await getBase64(file);
-        }
-
-        const newPost = {
-            id: Date.now(),
-            author: currentUser.name,
-            model: model,
-            nn: nn,
-            text: text,
-            image: imageData, // Сохраняем картинку
-            likes: 0,
-            dislikes: 0,
-            comments: [],
-            time: new Date().toLocaleString()
-        };
-
-        posts.unshift(newPost);
-        localStorage.setItem('posts', JSON.stringify(posts));
-        
-        // Отправка в GitHub (если токен указан)
-        if (GITHUB_TOKEN && GITHUB_TOKEN !== "ghp_ТВОЙ_ТОКЕН_ЗДЕСЬ") {
-            try {
-                const fileName = `posts/${newPost.id}.json`;
-                await fetch(`https://api.github.com/repos/${REPO}/contents/${fileName}`, {
-                    method: 'PUT',
-                    headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        message: "Post from " + currentUser.name, 
-                        content: btoa(unescape(encodeURIComponent(JSON.stringify(newPost)))) 
-                    })
-                });
-            } catch (e) { console.error("Ошибка GitHub:", e); }
-        }
-
-        document.getElementById('p_model').value = '';
-        document.getElementById('p_nn').value = '';
-        document.getElementById('p_text').value = '';
-        fileInput.value = '';
-        showToast("Промпт опубликован!");
-        showPage('home');
-    }
-
-    // --- КОПИРОВАНИЕ ПРОМПТА ---
-    function copyPrompt(id) {
-        const post = posts.find(p => p.id === id);
-        if(post) {
-            navigator.clipboard.writeText(post.text).then(() => {
-                showToast("📋 Промпт скопирован!");
-            }).catch(err => showToast("Ошибка копирования", "#e74c3c"));
-        }
-    }
-
-    // --- ЛАЙКИ И КОММЕНТАРИИ ---
-    function likePost(id) {
-        if (!currentUser) return showToast("Сначала войдите!", "#e74c3c");
-        posts.find(p => p.id === id).likes++;
-        localStorage.setItem('posts', JSON.stringify(posts));
-        renderPosts();
-    }
-
-    function dislikePost(id) {
-        if (!currentUser) return showToast("Сначала войдите!", "#e74c3c");
-        posts.find(p => p.id === id).dislikes++;
-        localStorage.setItem('posts', JSON.stringify(posts));
-        renderPosts();
-    }
-
-    function addComment(id) {
-        if (!currentUser) return showToast("Сначала войдите!", "#e74c3c");
-        const input = document.getElementById(`comm_input_${id}`);
-        if (!input.value.trim()) return;
-
-        posts.find(p => p.id === id).comments.push({ 
-            author: currentUser.name, text: input.value.trim(), time: new Date().toLocaleTimeString() 
-        });
-        localStorage.setItem('posts', JSON.stringify(posts));
-        renderPosts();
-    }
-
-    // --- РЕНДЕР ЛЕНТЫ ---
-    function renderPosts() {
         const list = document.getElementById('postsList');
-        list.innerHTML = '';
-        if (posts.length === 0) return list.innerHTML = '<div style="text-align:center; padding: 40px; background: rgba(0,0,0,0.2); border-radius: 20px;">Нет постов. Опубликуйте первый!</div>';
-
-        posts.forEach(post => {
-            const commentsHtml = post.comments.map(c => `
-                <div class="comment"><strong>${c.author}:</strong> ${c.text} <span style="font-size: 0.7em; opacity: 0.6;">(${c.time})</span></div>
-            `).join('');
-
-            // Проверка на наличие картинки
-            const imageHtml = post.image ? `<img src="${post.image}" class="post-image" alt="Прикрепленное изображение">` : '';
-
+        list.innerHTML = sorted.length ? '' : '<div class="card" style="text-align:center;">Пока пусто.</div>';
+        
+        sorted.forEach(p => {
+            if(!p.likes) p.likes = []; // Фикс старых постов
             list.innerHTML += `
-                <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
-                        <div>👤 <strong style="color: var(--accent);">${post.author}</strong></div>
-                        <div style="font-size: 0.8em; opacity: 0.6;">${post.time}</div>
-                    </div>
-                    
-                    <h3 style="margin: 0 0 10px 0; font-size: 1.4em;">${post.model} <span style="font-size: 0.7em; font-weight: normal; background: rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 10px; margin-left: 5px;">${post.nn}</span></h3>
-                    
-                    <div class="prompt-box">
-                        <button class="copy-btn" onclick="copyPrompt(${post.id})">📋 Копировать</button>
-                        <pre class="prompt-text">${post.text}</pre>
-                    </div>
-
-                    ${imageHtml}
-                    
-                    <div class="actions">
-                        <button class="action-btn" onclick="likePost(${post.id})">👍 ${post.likes}</button>
-                        <button class="action-btn" onclick="dislikePost(${post.id})">👎 ${post.dislikes}</button>
-                    </div>
-
-                    <div class="comments-section">
-                        <h4 style="margin-top:0;">Комментарии (${post.comments.length})</h4>
-                        ${commentsHtml}
-                        <div class="comment-box">
-                            <input id="comm_input_${post.id}" placeholder="Ваш комментарий...">
-                            <button class="action-btn" style="background:var(--accent); color: white;" onclick="addComment(${post.id})">Отправить</button>
-                        </div>
+                <div class="card mini-card" onclick="openPost(${p.id})">
+                    <h3 style="margin:0 0 10px 0;">${p.model} <span class="tag">${p.nn}</span></h3>
+                    <div class="meta-info">
+                        <span onclick="event.stopPropagation(); openProfile('${p.author}')" class="user-link">👤 ${p.author}</span>
+                        <span>👍 ${p.likes.length}</span>
+                        <span>📋 ${p.copies || 0}</span>
+                        <span style="margin-left:auto;">${p.time.split(',')[0]}</span>
                     </div>
                 </div>
             `;
         });
     }
 
-    // Запуск
+    // СТРАНИЦА ПРОМПТА
+    function openPost(id) {
+        const p = posts.find(x => x.id === id);
+        if(!p) return;
+        if(!p.likes) p.likes = [];
+        if(!p.dislikes) p.dislikes = [];
+        
+        const isLiked = currentUser && p.likes.includes(currentUser.name) ? 'active' : '';
+        const isDisliked = currentUser && p.dislikes.includes(currentUser.name) ? 'active' : '';
+        const isFav = currentUser && currentUser.favorites.includes(p.id) ? 'active' : '';
+        const isAuthor = currentUser && currentUser.name === p.author;
+
+        let html = `
+            <div class="card" style="margin-top:0;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span class="user-link" onclick="openProfile('${p.author}')">👤 ${p.author}</span>
+                    <span style="opacity:0.6; font-size:0.8em;">${p.time}</span>
+                </div>
+                <h2>${p.model} <span class="tag">${p.nn}</span></h2>
+                
+                <div class="prompt-box">
+                    <button class="copy-btn" onclick="doCopy(${p.id})">📋 Копировать</button>
+                    <pre class="prompt-text">${p.text}</pre>
+                </div>
+                ${p.image ? `<img src="${p.image}" class="post-img">` : ''}
+                
+                <div class="actions-bar">
+                    <button class="action-btn ${isLiked}" onclick="toggleLike(${p.id})">👍 ${p.likes.length}</button>
+                    <button class="action-btn ${isDisliked}" onclick="toggleDislike(${p.id})">👎 ${p.dislikes.length}</button>
+                    <button class="action-btn ${isFav}" onclick="toggleFav(${p.id})">⭐ В избранное</button>
+                    ${isAuthor ? `<button class="action-btn" onclick="editPost(${p.id})" style="margin-left:auto; background:rgba(255,255,255,0.2);">✏️ Редактировать</button>` : ''}
+                </div>
+
+                <div class="comments-list">
+                    <h4>Отзывы и комментарии (${p.comments.length})</h4>
+                    ${p.comments.map(c => `<div class="comment"><strong><span class="user-link" onclick="openProfile('${c.author}')">${c.author}</span>:</strong> ${c.text} <div style="font-size:0.7em; opacity:0.6; margin-top:5px;">${c.time}</div></div>`).join('')}
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <input id="c_txt_${p.id}" placeholder="Написать отзыв..." style="margin:0;">
+                        <button class="btn-small" onclick="addComment(${p.id})">Отправить</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById('postContent').innerHTML = html;
+        showPage('postDetail');
+    }
+
+    // ДЕЙСТВИЯ С ПРОМПТОМ
+    function doCopy(id) {
+        let p = posts.find(x => x.id === id);
+        navigator.clipboard.writeText(p.text);
+        p.copies = (p.copies || 0) + 1;
+        localStorage.setItem('posts', JSON.stringify(posts));
+        toast("📋 Скопировано!");
+        openPost(id); // Обновить интерфейс
+    }
+
+    function toggleLike(id) {
+        if(!currentUser) return toast("Войдите в аккаунт", "#e74c3c");
+        let p = posts.find(x => x.id === id);
+        let idx = p.likes.indexOf(currentUser.name);
+        if(idx > -1) p.likes.splice(idx, 1);
+        else { p.likes.push(currentUser.name); p.dislikes = p.dislikes.filter(n => n !== currentUser.name); }
+        localStorage.setItem('posts', JSON.stringify(posts)); openPost(id);
+    }
+
+    function toggleDislike(id) {
+        if(!currentUser) return toast("Войдите в аккаунт", "#e74c3c");
+        let p = posts.find(x => x.id === id);
+        let idx = p.dislikes.indexOf(currentUser.name);
+        if(idx > -1) p.dislikes.splice(idx, 1);
+        else { p.dislikes.push(currentUser.name); p.likes = p.likes.filter(n => n !== currentUser.name); }
+        localStorage.setItem('posts', JSON.stringify(posts)); openPost(id);
+    }
+
+    function toggleFav(id) {
+        if(!currentUser) return toast("Войдите в аккаунт", "#e74c3c");
+        let idx = currentUser.favorites.indexOf(id);
+        if(idx > -1) currentUser.favorites.splice(idx, 1);
+        else currentUser.favorites.push(id);
+        syncUser(); openPost(id); toast(idx > -1 ? "Удалено из избранного" : "Добавлено в избранное");
+    }
+
+    function addComment(id) {
+        if(!currentUser) return toast("Войдите в аккаунт", "#e74c3c");
+        let txt = document.getElementById(`c_txt_${id}`).value.trim();
+        if(!txt) return;
+        posts.find(x => x.id === id).comments.push({ author: currentUser.name, text: txt, time: new Date().toLocaleString() });
+        localStorage.setItem('posts', JSON.stringify(posts)); openPost(id);
+    }
+
+    // ПРОФИЛЬ
+    function openProfile(username) {
+        let targetUser = usersDB.find(u => u.name === username) || (currentUser && currentUser.name === username ? currentUser : null);
+        if(!targetUser) return toast("Пользователь не найден", "#e74c3c");
+        
+        let isMe = currentUser && currentUser.name === username;
+        let isFollowing = currentUser && currentUser.following.includes(username);
+        
+        let userPosts = posts.filter(p => p.author === username);
+        let favPosts = isMe ? posts.filter(p => currentUser.favorites.includes(p.id)) : [];
+
+        let html = `
+            <div class="profile-header">
+                <div class="profile-avatar">👤</div>
+                <h2>${username}</h2>
+                <div class="stats">
+                    <div><strong>${userPosts.length}</strong><br>Промптов</div>
+                    <div><strong>${targetUser.followers?.length||0}</strong><br>Подписчиков</div>
+                    <div><strong>${targetUser.following?.length||0}</strong><br>Подписок</div>
+                </div>
+                ${!isMe && currentUser ? `<button class="${isFollowing ? 'btn-outline' : 'btn-small'}" style="max-width:200px;" onclick="toggleFollow('${username}')">${isFollowing ? 'Отписаться' : 'Подписаться'}</button>` : ''}
+                ${isMe ? `<button class="btn-small btn-outline" style="max-width:200px; margin-top:10px; border-color:#e74c3c; color:#e74c3c;" onclick="doLogout()">Выйти из аккаунта</button>` : ''}
+            </div>
+            
+            <h3>Промпты автора</h3>
+            <div id="profPosts">${renderMiniList(userPosts)}</div>
+            
+            ${isMe && favPosts.length ? `<h3>Избранное</h3><div>${renderMiniList(favPosts)}</div>` : ''}
+        `;
+        document.getElementById('profileContent').innerHTML = html;
+        showPage('profile');
+    }
+
+    function toggleFollow(username) {
+        let target = usersDB.find(u => u.name === username);
+        if(!target) return;
+        
+        let idx = currentUser.following.indexOf(username);
+        if(idx > -1) {
+            currentUser.following.splice(idx, 1);
+            target.followers = target.followers.filter(n => n !== currentUser.name);
+        } else {
+            currentUser.following.push(username);
+            if(!target.followers) target.followers = [];
+            target.followers.push(currentUser.name);
+        }
+        syncUser();
+        // Обновляем цель в БД
+        let tIdx = usersDB.findIndex(u => u.name === username);
+        usersDB[tIdx] = target; localStorage.setItem('usersDB', JSON.stringify(usersDB));
+        openProfile(username);
+    }
+
+    function renderMiniList(arr) {
+        if(!arr.length) return `<div class="card" style="text-align:center; padding:15px;">Пусто</div>`;
+        return arr.map(p => `
+            <div class="card mini-card" onclick="openPost(${p.id})">
+                <h4 style="margin:0 0 5px 0;">${p.model}</h4>
+                <div style="font-size:0.8em; opacity:0.7;">👍 ${p.likes?.length||0} | 📋 ${p.copies||0}</div>
+            </div>
+        `).join('');
+    }
+
+    // ПУБЛИКАЦИЯ И РЕДАКТИРОВАНИЕ
+    function openPublish() {
+        editPostId = null;
+        document.getElementById('pubTitle').innerText = "Новый промпт";
+        document.getElementById('pubBtn').innerText = "🚀 Опубликовать";
+        document.getElementById('p_model').value = ''; document.getElementById('p_nn').value = ''; document.getElementById('p_text').value = '';
+        showPage('publish');
+    }
+
+    function editPost(id) {
+        let p = posts.find(x => x.id === id);
+        if(!p || p.author !== currentUser.name) return;
+        editPostId = id;
+        document.getElementById('pubTitle').innerText = "Редактировать промпт";
+        document.getElementById('pubBtn').innerText = "💾 Сохранить изменения";
+        document.getElementById('p_model').value = p.model;
+        document.getElementById('p_nn').value = p.nn;
+        document.getElementById('p_text').value = p.text;
+        showPage('publish');
+    }
+
+    async function savePost() {
+        let m = document.getElementById('p_model').value, nn = document.getElementById('p_nn').value, txt = document.getElementById('p_text').value;
+        if(!m || !txt) return toast("Заполните модель и промпт", "#e74c3c");
+        
+        let file = document.getElementById('p_image').files[0];
+        let imgBase64 = null;
+        if(file) {
+            if(file.size > 2*1024*1024) return toast("Фото до 2МБ", "#e74c3c");
+            imgBase64 = await new Promise(r => { let rd = new FileReader(); rd.onload=()=>r(rd.result); rd.readAsDataURL(file); });
+        }
+
+        if(editPostId) {
+            let p = posts.find(x => x.id === editPostId);
+            p.model = m; p.nn = nn; p.text = txt; if(imgBase64) p.image = imgBase64;
+            toast("Промпт обновлен!");
+            openPost(editPostId);
+        } else {
+            posts.unshift({ id: Date.now(), author: currentUser.name, model: m, nn: nn, text: txt, image: imgBase64, likes: [], dislikes: [], copies: 0, comments: [], time: new Date().toLocaleString() });
+            toast("Опубликовано!");
+            showPage('home');
+        }
+        localStorage.setItem('posts', JSON.stringify(posts));
+    }
+
+    // СТАРТ
     initNav();
+    showPage('home');
 </script>
 
 </body>
