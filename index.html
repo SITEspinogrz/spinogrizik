@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Spinogrizik</title>
+    <style>
+        :root { --glass: rgba(255, 255, 255, 0.08); }
+        
+        body { 
+            margin: 0; 
+            font-family: 'Segoe UI', sans-serif; 
+            /* Новый качественный фон */
+            background: url('https://img.freepik.com/free-vector/wave-dark-gradient-background-desogn_343694-4095.jpg?t=st=1715970000~exp=1715973600~hmac=a1b2c3d4e5f6g7h8i9j0') no-repeat center center fixed; 
+            background-size: cover; 
+            color: white; 
+            min-height: 100dvh; /* Учет высоты мобильных браузеров */
+            display: flex;
+            flex-direction: column;
+        }
+
+        nav { 
+            background: rgba(0, 0, 0, 0.2); 
+            backdrop-filter: blur(15px); 
+            padding: 15px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .page { display: none; padding: 20px; flex: 1; }
+        .active { display: block; }
+        
+        .card { 
+            background: var(--glass); 
+            backdrop-filter: blur(15px); 
+            padding: 20px; 
+            margin-bottom: 15px; 
+            border-radius: 20px; 
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        input, textarea, button { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 8px 0; 
+            border-radius: 12px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            background: rgba(255,255,255,0.05); 
+            color: white; 
+            box-sizing: border-box;
+        }
+
+        button { 
+            background: #4a90e2; 
+            cursor: pointer; 
+            font-weight: bold; 
+            border: none;
+        }
+
+        .logo { font-size: 1.4em; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo" onclick="showPage('home')">Spinogrizik</div>
+    <div>
+        <button style="width: auto;" onclick="showPage('publish')">➕</button>
+        <span id="userMenu"><button style="width: auto;" onclick="showPage('auth')">Вход</button></span>
+    </div>
+</nav>
+
+<div id="home" class="page active">
+    <h2>Лента промптов</h2>
+    <div id="posts"></div>
+</div>
+
+<div id="publish" class="page">
+    <h2>Создать пост</h2>
+    <input id="p_model" placeholder="Имя модели">
+    <input id="p_nn" placeholder="Название нейросети">
+    <textarea id="p_prompt" placeholder="Ваш промпт"></textarea>
+    <div style="font-size: 0.8em; opacity: 0.7;">Защита: 5 + 3 = ?</div>
+    <input id="cap" type="number" placeholder="Ответ">
+    <button onclick="publishPost()">Опубликовать</button>
+</div>
+
+<div id="auth" class="page">
+    <h2>Вход / Регистрация</h2>
+    <input id="user" placeholder="Логин">
+    <input id="pass" type="password" placeholder="Пароль">
+    <button onclick="login()">Войти</button>
+</div>
+
+<script>
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    function login() {
+        const user = document.getElementById('user').value;
+        if(user) {
+            localStorage.setItem('currentUser', user);
+            document.getElementById('userMenu').innerHTML = `<span>👤 ${user}</span>`;
+            showPage('home');
+        }
+    }
+
+    function publishPost() {
+        if (document.getElementById('cap').value != "8") {
+            alert("Ошибка бота!");
+            return;
+        }
+        
+        const post = {
+            model: document.getElementById('p_model').value,
+            nn: document.getElementById('p_nn').value,
+            prompt: document.getElementById('p_prompt').value,
+            author: localStorage.getItem('currentUser') || 'Гость'
+        };
+        
+        let posts = JSON.parse(localStorage.getItem('posts') || '[]');
+        posts.push(post);
+        localStorage.setItem('posts', JSON.stringify(posts));
+        
+        renderPosts();
+        showPage('home');
+    }
+
+    function renderPosts() {
+        const posts = JSON.parse(localStorage.getItem('posts') || '
