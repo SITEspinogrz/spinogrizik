@@ -1,134 +1,277 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Spinogrizik</title>
-    <style>
-        :root { --glass: rgba(255, 255, 255, 0.08); }
-        
-        body { 
-            margin: 0; 
-            font-family: 'Segoe UI', sans-serif; 
-            /* Новый качественный фон */
-            background: url('https://img.freepik.com/free-vector/wave-dark-gradient-background-desogn_343694-4095.jpg?t=st=1715970000~exp=1715973600~hmac=a1b2c3d4e5f6g7h8i9j0') no-repeat center center fixed; 
-            background-size: cover; 
-            color: white; 
-            min-height: 100dvh; /* Учет высоты мобильных браузеров */
-            display: flex;
-            flex-direction: column;
-        }
-
-        nav { 
-            background: rgba(0, 0, 0, 0.2); 
-            backdrop-filter: blur(15px); 
-            padding: 15px 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .page { display: none; padding: 20px; flex: 1; }
-        .active { display: block; }
-        
-        .card { 
-            background: var(--glass); 
-            backdrop-filter: blur(15px); 
-            padding: 20px; 
-            margin-bottom: 15px; 
-            border-radius: 20px; 
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        input, textarea, button { 
-            width: 100%; 
-            padding: 12px; 
-            margin: 8px 0; 
-            border-radius: 12px; 
-            border: 1px solid rgba(255,255,255,0.1); 
-            background: rgba(255,255,255,0.05); 
-            color: white; 
-            box-sizing: border-box;
-        }
-
-        button { 
-            background: #4a90e2; 
-            cursor: pointer; 
-            font-weight: bold; 
-            border: none;
-        }
-
-        .logo { font-size: 1.4em; font-weight: bold; cursor: pointer; }
-    </style>
-</head>
-<body>
-
-<nav>
-    <div class="logo" onclick="showPage('home')">Spinogrizik</div>
-    <div>
-        <button style="width: auto;" onclick="showPage('publish')">➕</button>
-        <span id="userMenu"><button style="width: auto;" onclick="showPage('auth')">Вход</button></span>
-    </div>
-</nav>
-
-<div id="home" class="page active">
-    <h2>Лента промптов</h2>
-    <div id="posts"></div>
-</div>
-
-<div id="publish" class="page">
-    <h2>Создать пост</h2>
-    <input id="p_model" placeholder="Имя модели">
-    <input id="p_nn" placeholder="Название нейросети">
-    <textarea id="p_prompt" placeholder="Ваш промпт"></textarea>
-    <div style="font-size: 0.8em; opacity: 0.7;">Защита: 5 + 3 = ?</div>
-    <input id="cap" type="number" placeholder="Ответ">
-    <button onclick="publishPost()">Опубликовать</button>
-</div>
-
-<div id="auth" class="page">
-    <h2>Вход / Регистрация</h2>
-    <input id="user" placeholder="Логин">
-    <input id="pass" type="password" placeholder="Пароль">
-    <button onclick="login()">Войти</button>
-</div>
-
 <script>
+    // ====================================================================
+    // ❗ 1. ВСТАВЬ СЮДА СВОЙ GITHUB ТОКЕН (обязательно с правами repo)
+    const GITHUB_TOKEN = "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"; 
+    
+    // ❗ 2. ВСТАВЬ СЮДА СВОЙ PUBLIC KEY ОТ EMAILJS (В кавычки)
+    const EMAILJS_PUBLIC_KEY = "kTfs9-_qPr1PSracH";
+    // ====================================================================
+
+    // Инициализация EmailJS
+    if(EMAILJS_PUBLIC_KEY) { emailjs.init(EMAILJS_PUBLIC_KEY); }
+
+    const REPO = "SITEspinogrz/spinogrizik";
+
+    // --- БАЗА ДАННЫХ В БРАУЗЕРЕ ---
+    let currentUser = JSON.parse(localStorage.getItem('currentUser')); 
+    let usersDB = JSON.parse(localStorage.getItem('usersDB') || '[]'); 
+    let posts = JSON.parse(localStorage.getItem('posts') || '[]');
+
+    let currentCaptchaText = "";
+    let authMode = 'login'; 
+    let expectedCode = "";
+    let pendingUserData = null;
+
+    // --- НАВИГАЦИЯ ---
     function showPage(id) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById(id).classList.add('active');
+        if (id === 'home') renderPosts();
+        if (id === 'auth') { generateCaptcha(); renderAuthForm(); }
     }
 
-    function login() {
-        const user = document.getElementById('user').value;
-        if(user) {
-            localStorage.setItem('currentUser', user);
-            document.getElementById('userMenu').innerHTML = `<span>👤 ${user}</span>`;
-            showPage('home');
+    function initNav() {
+        const nav = document.getElementById('navProfile');
+        if (currentUser) {
+            nav.innerHTML = `
+                <span style="font-weight: bold;">👤 ${currentUser.name}</span>
+                <button class="action-btn" onclick="showPage('publish')">➕ Пост</button>
+                <button class="action-btn" onclick="logout()" style="background: #e74c3c;">Выйти</button>
+            `;
+        } else {
+            nav.innerHTML = `<button class="action-btn" onclick="showPage('auth')" style="background: #6c5ce7;">Войти</button>`;
         }
-    }
-
-    function publishPost() {
-        if (document.getElementById('cap').value != "8") {
-            alert("Ошибка бота!");
-            return;
-        }
-        
-        const post = {
-            model: document.getElementById('p_model').value,
-            nn: document.getElementById('p_nn').value,
-            prompt: document.getElementById('p_prompt').value,
-            author: localStorage.getItem('currentUser') || 'Гость'
-        };
-        
-        let posts = JSON.parse(localStorage.getItem('posts') || '[]');
-        posts.push(post);
-        localStorage.setItem('posts', JSON.stringify(posts));
-        
         renderPosts();
+    }
+
+    function logout() {
+        currentUser = null;
+        localStorage.removeItem('currentUser');
+        initNav();
         showPage('home');
     }
 
+    // --- КАПЧА (Защита от ботов) ---
+    function generateCaptcha() {
+        const canvas = document.getElementById('captchaCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        for(let i=0; i<30; i++) {
+            ctx.fillStyle = `rgba(${Math.random()*255},${Math.random()*255},${Math.random()*255}, 0.5)`;
+            ctx.beginPath();
+            ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*3, 0, Math.PI*2);
+            ctx.fill();
+        }
+
+        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        currentCaptchaText = "";
+        for(let i=0; i<5; i++) currentCaptchaText += chars.charAt(Math.floor(Math.random() * chars.length));
+
+        ctx.font = "24px Arial";
+        ctx.fillStyle = "#000";
+        ctx.setTransform(1, Math.random()*0.2-0.1, Math.random()*0.2-0.1, 1, 0, 0); 
+        ctx.fillText(currentCaptchaText, 15, 28);
+        ctx.setTransform(1, 0, 0, 1, 0, 0); 
+    }
+
+    // --- АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ ---
+    function switchTab(mode) {
+        authMode = mode;
+        document.getElementById('tabLogin').classList.toggle('active-tab', mode === 'login');
+        document.getElementById('tabReg').classList.toggle('active-tab', mode === 'reg');
+        renderAuthForm();
+        generateCaptcha();
+    }
+
+    function renderAuthForm() {
+        const html = authMode === 'login' 
+            ? `<input id="a_email" type="email" placeholder="Ваш Email">
+               <input id="a_pass" type="password" placeholder="Пароль">`
+            : `<input id="a_name" type="text" placeholder="Придумайте Никнейм">
+               <input id="a_email" type="email" placeholder="Ваш Email">
+               <input id="a_pass" type="password" placeholder="Придумайте Пароль">`;
+        document.getElementById('authForms').innerHTML = html;
+        document.getElementById('authActionBtn').innerText = authMode === 'login' ? 'Войти' : 'Зарегистрироваться';
+    }
+
+    async function processAuth() {
+        const email = document.getElementById('a_email').value.trim();
+        const pass = document.getElementById('a_pass').value.trim();
+        const captchaInput = document.getElementById('captchaInput').value.toUpperCase();
+
+        if(!email || !pass) return alert("Заполните все поля!");
+        if(captchaInput !== currentCaptchaText) {
+            alert("Неверная капча!");
+            generateCaptcha();
+            return;
+        }
+
+        if (authMode === 'reg') {
+            const name = document.getElementById('a_name').value.trim();
+            if(!name) return alert("Введите Никнейм!");
+            if(usersDB.find(u => u.email === email)) return alert("Этот Email уже зарегистрирован!");
+            pendingUserData = { name, email, pass };
+        } else {
+            const user = usersDB.find(u => u.email === email && u.pass === pass);
+            if(!user) return alert("Неверный Email или Пароль!");
+            pendingUserData = user;
+        }
+
+        expectedCode = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        try {
+            document.getElementById('authActionBtn').innerText = "Отправка письма...";
+            await emailjs.send("service_bpp4tkr", "template_fskbb8q", { 
+                to_email: email, 
+                code: expectedCode 
+            });
+            alert("Письмо с кодом отправлено на " + email);
+            showPage('verify');
+        } catch (error) {
+            console.error(error);
+            alert("Ошибка EmailJS. Для теста ваш код: " + expectedCode);
+            showPage('verify');
+        } finally {
+            document.getElementById('authActionBtn').innerText = "Продолжить";
+        }
+    }
+
+    function verifyCode() {
+        if (document.getElementById('v_code').value !== expectedCode) return alert("Неверный код!");
+
+        if (authMode === 'reg') {
+            usersDB.push(pendingUserData);
+            localStorage.setItem('usersDB', JSON.stringify(usersDB));
+            alert("Регистрация успешна!");
+        }
+
+        currentUser = pendingUserData;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        
+        expectedCode = "";
+        pendingUserData = null;
+        
+        initNav();
+        showPage('home');
+    }
+
+    // --- ОТПРАВКА В GITHUB ---
+    async function addPost() {
+        if (!currentUser) return alert('Войдите в аккаунт!');
+        const model = document.getElementById('p_model').value;
+        const nn = document.getElementById('p_nn').value;
+        const text = document.getElementById('p_text').value;
+
+        if (!model || !text) return alert('Заполните все поля!');
+
+        const newPost = {
+            id: Date.now(),
+            author: currentUser.name,
+            model: model,
+            nn: nn,
+            text: text,
+            likes: 0,
+            dislikes: 0,
+            comments: [],
+            time: new Date().toLocaleString()
+        };
+
+        // 1. Отображаем мгновенно у пользователя
+        posts.unshift(newPost);
+        localStorage.setItem('posts', JSON.stringify(posts));
+        
+        // 2. Отправляем файл в твой GitHub репозиторий
+        try {
+            const fileName = `posts/${newPost.id}.json`;
+            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileName}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    message: "New post from " + currentUser.name, 
+                    content: btoa(unescape(encodeURIComponent(JSON.stringify(newPost)))) 
+                })
+            });
+
+            if (res.ok) {
+                alert("Промпт успешно загружен в GitHub!");
+            } else {
+                alert("Ошибка GitHub: проверьте токен!");
+            }
+        } catch (e) {
+            console.error("Ошибка при отправке в GitHub:", e);
+        }
+
+        document.getElementById('p_model').value = '';
+        document.getElementById('p_nn').value = '';
+        document.getElementById('p_text').value = '';
+        showPage('home');
+    }
+
+    // --- ЛАЙКИ И КОММЕНТАРИИ (Сохраняются локально для теста) ---
+    function likePost(id) {
+        if (!currentUser) return alert('Сначала войдите!');
+        posts.find(p => p.id === id).likes++;
+        localStorage.setItem('posts', JSON.stringify(posts));
+        renderPosts();
+    }
+
+    function dislikePost(id) {
+        if (!currentUser) return alert('Сначала войдите!');
+        posts.find(p => p.id === id).dislikes++;
+        localStorage.setItem('posts', JSON.stringify(posts));
+        renderPosts();
+    }
+
+    function addComment(id) {
+        if (!currentUser) return alert('Сначала войдите!');
+        const input = document.getElementById(`comm_input_${id}`);
+        if (!input.value.trim()) return;
+
+        posts.find(p => p.id === id).comments.push({ 
+            author: currentUser.name, 
+            text: input.value.trim(), 
+            time: new Date().toLocaleTimeString() 
+        });
+        
+        localStorage.setItem('posts', JSON.stringify(posts));
+        renderPosts();
+    }
+
     function renderPosts() {
-        const posts = JSON.parse(localStorage.getItem('posts') || '
+        const list = document.getElementById('postsList');
+        list.innerHTML = '';
+        if (posts.length === 0) return list.innerHTML = '<p>Пока нет постов. Опубликуйте первый!</p>';
+
+        posts.forEach(post => {
+            const commentsHtml = post.comments.map(c => `
+                <div class="comment"><strong>${c.author}:</strong> ${c.text} <span style="font-size: 0.7em; color: #ccc;">(${c.time})</span></div>
+            `).join('');
+
+            list.innerHTML += `
+                <div class="card">
+                    <div style="font-size: 0.9em; color: #ccc; margin-bottom: 10px;">👤 <strong>${post.author}</strong> • ${post.time}</div>
+                    <h3 style="margin-top: 0;">${post.model} <small>(${post.nn})</small></h3>
+                    <p style="white-space: pre-wrap; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;">${post.text}</p>
+                    
+                    <div class="actions">
+                        <button class="action-btn" onclick="likePost(${post.id})">👍 ${post.likes}</button>
+                        <button class="action-btn" onclick="dislikePost(${post.id})">👎 ${post.dislikes}</button>
+                    </div>
+
+                    <div class="comments-section">
+                        <h4>Комментарии (${post.comments.length})</h4>
+                        ${commentsHtml}
+                        <div class="comment-box">
+                            <input id="comm_input_${post.id}" placeholder="Написать комментарий..." style="margin:0;">
+                            <button class="action-btn" style="background:#6c5ce7; margin:0;" onclick="addComment(${post.id})">Отправить</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // Запуск
+    initNav();
+                </script>
