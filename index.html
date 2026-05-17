@@ -195,7 +195,7 @@
     const EMAILJS_PUBLIC_KEY = "kTfs9-_qPr1PSracH";
     const REPO = "SITEspinogrz/spinogrizik";
 
-    if(EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== "kTfs9-_qPr1PSracH") { 
+    if(EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== "ТВОЙ_PUBLIC_KEY_ОТ_EMAILJS") { 
         emailjs.init(EMAILJS_PUBLIC_KEY); 
     }
     // ====================================================
@@ -386,7 +386,7 @@
         localStorage.setItem('posts', JSON.stringify(posts));
         
         // Отправка в GitHub (если токен указан)
-        if (GITHUB_TOKEN && GITHUB_TOKEN !== "") {
+        if (GITHUB_TOKEN && GITHUB_TOKEN !== "ghp_ТВОЙ_ТОКЕН_ЗДЕСЬ") {
             try {
                 const fileName = `posts/${newPost.id}.json`;
                 await fetch(`https://api.github.com/repos/${REPO}/contents/${fileName}`, {
